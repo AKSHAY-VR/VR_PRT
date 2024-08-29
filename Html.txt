@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Manifestos</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5ebd4;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+            background-image: url('parliament.jpg'); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            color: #fbedcb;
+            z-index: 10; /* Ensure header is above other content */
+            position: relative;
+        }
+
+        .logo-container img {
+            height: 70px;
+        }
+
+        .filter-container {
+            text-align: center; /* Center the filter title */
+            z-index: 15; /* Ensure filters are above section titles */
+            position: relative;
+            display: flex;
+            gap: 0; /* Remove the gap between the filters */
+            flex-wrap: wrap; /* Allow filters to wrap to the next line if necessary */
+            justify-content: center; /* Center the entire filter container */
+            align-items: center;
+            color: black; /* Set text color to black */
+        }
+
+        .multiselect {
+            position: relative;
+            display: inline-block;
+            min-width: 150px; /* Ensure filters have a smaller minimum width */
+            width: auto;
+        }
+
+        .selectBox {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px; /* Reduced padding */
+            background-color: #ffffff;
+            border: 2px solid #ccc;
+            border-left-width: 0px; /* Remove the left border to merge with the previous element */
+            cursor: pointer;
+            min-width: 150px; /* Reduced min-width for smaller containers */
+            width: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: black; /* Set the text color to black */
+        }
+
+        /* Apply border-radius to the left box */
+        .filter-container .multiselect:first-child .selectBox {
+            border-radius: 5px 0 0 5px; /* Rounded corners on the left */
+            border-left-width: 2px; /* Restore the left border */
+        }
+
+        /* Apply border-radius to the right box */
+        .filter-container .multiselect:last-child .selectBox {
+            border-radius: 0 5px 5px 0; /* Rounded corners on the right */
+        }
+
+        .selectBox:hover {
+            border-color: #888; /* Slightly darken border on hover */
+        }
+
+        .selectBox::after {
+            content: '\25BC'; /* Unicode for down arrow */
+            font-size: 12px;
+            margin-left: 10px;
+            color: #888;
+        }
+
+        .checkboxes {
+            display: none;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+            position: absolute;
+            z-index: 1;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left; /* Align text to the left */
+            padding-left: 10px; /* Add some padding to the left for better alignment */
+        }
+
+        .checkboxes label {
+            display: block;
+            padding: 8px;
+            cursor: pointer;
+            color: #333; /* Set the text color to dark grey */
+            transition: background-color 0.2s ease;
+            text-align: left; /* Ensure text is aligned to the left */
+        }
+
+        .checkboxes label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .topic-section {
+            margin-bottom: 40px;
+            position: relative;
+            padding-top: 40px; /* Space for the sticky title */
+        }
+
+        .section-title-container {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 5; /* Ensure titles are above the cards but below filters */
+            background-color: #f5ebd4;
+            border-bottom: 2px solid #ccc;
+            padding: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .candidate-card-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping */
+            padding: 20px;
+        }
+
+        .candidate-card {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px; /* Centres the image horizontally */
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+            width: 200px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: normal; /* Ensure card content wraps within the card */
+        }
+
+        .candidate-card img {
+            display: block;
+            margin: 0 auto 10px auto; /* Centres the image and adds margin below it */
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+        }
+
+        .party-symbol {
+            text-align: right; /* Aligns the image to the right */
+        }
+
+        .party-symbol img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .reference-button {
+            display: block;
+            padding: 8px 8px;
+            background-color: #f7f8f3ee;
+            color: rgb(22, 22, 22);
+            border: black;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: auto; /* Push the button to the bottom */
+        }
+
+        .reference-button:hover {
+            background-color: #959c8074;
+        }
+
+        .promise-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .promise-page {
+            font-size: 0.9em;
+            color: gray;
+            margin-bottom: 10px;
+        }
+
+        .promise-container {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white; /* Default background color */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: auto; /* Allow the container to expand to fit content */
+        }
+
+        /* Updated Page navigation buttons container */
+        .page-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .page-button {
+            flex: 1;
+            padding: 15px 0;
+            background-color: rgba(0, 0, 0, 0.2); /* Set a semi-transparent background */
+            color: black; /* Set text colour to black */
+            border: 2px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 10px; /* Add rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
+        }
+
+        .page-button:not(:last-child) {
+            border-right: none; /* Remove border between buttons */
+        }
+
+        .page-button:hover {
+            background-color: rgba(255, 255, 255, 0.3); /* Lighten the background on hover */
+            color: black; /* Keep text black on hover */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Intensify shadow on hover */
+            transform: translateY(-2px); /* Slight upward movement on hover */
+        }
+
+        /* Add styles for Fantasy 11 page */
+        .fantasy-candidate-container {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f7f8f3ee;
+        }
+
+        .fantasy-candidate-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .fantasy-promise {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .fantasy-promise input {
+            margin-right: 10px;
+        }
+
+        .candidate-card:hover {
+            transform: scale(1.1) translateZ(30px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+         }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header container with logo and filters -->
+    <div class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo"> <!-- Replace with your logo path -->
+        </div>
+        <div class="filter-container">
+            <div class="multiselect">
+                <div class="selectBox" onclick="toggleCheckboxes('candidate-checkboxes')">
+                    <span>Select Candidates</span>
+                    <div class="overSelect"></div>
+                </div>
+                <div id="candidate-checkboxes" class="checkboxes"></div>
+            </div>
+
+            <div class="multiselect">
+                <div class="selectBox" onclick="toggleCheckboxes('topic-checkboxes')">
+                    <span>Select Topics</span>
+                    <div class="overSelect"></div>
+                </div>
+                <div id="topic-checkboxes" class="checkboxes"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page navigation buttons below the header -->
+    <div class="page-buttons-container">
+        <div class="page-button" onclick="showManifestoPage()">
+            Manifesto Promises
+        </div>
+        <div class="page-button" onclick="showFantasy11Page()">
+            Fantasy 11
+        </div>
+    </div>
+
+    <!-- Dynamic content sections will be inserted here -->
+    <div id="content"></div>
+
+    <!-- Placeholder for Fantasy 11 content -->
+    <div id="fantasy11-content" style="display: none;">
+        <h2>Fantasy 11</h2>
+        <div id="fantasy-candidates-container"></div>
+    </div>
+
+    <!-- Import D3.js and SheetJS libraries -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
